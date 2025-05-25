@@ -17,11 +17,10 @@ import { useQuery } from "@tanstack/react-query";
 import { eventsQueryOptions } from "../../eventQueryOptions";
 
 export const CalendarIndex = () => {
+  const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(
     format(new Date(), "yyyy-MM-dd")
   );
-
-  const [open, setOpen] = useState(false);
 
   const [selectedEventId, setSelectedEventId] = useState<
     number | string | null
