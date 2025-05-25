@@ -3,13 +3,17 @@ import "./App.css";
 import { CalendarIndex } from "./components/calendar/CalendarIndex";
 import { queryClient } from "./queryClient";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@mui/material";
+import theme from "./theme";
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <CalendarIndex />
-      <Toaster />
-    </QueryClientProvider>
+    <ThemeProvider theme={theme}>
+      <QueryClientProvider client={queryClient}>
+        <CalendarIndex />
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

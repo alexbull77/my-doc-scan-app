@@ -21,20 +21,7 @@ export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
     const endDate = parse(calendarEvent.end, "yyyy-MM-dd HH:mm", new Date());
 
     return (
-      <div
-        className="
-          sx__event-modal sx__event-modal-default is-open
-          absolute
-          bg-white
-          p-6
-          rounded-2xl
-          shadow-lg
-          text-gray-900
-          select-text
-          font-sans
-          space-y-5
-        "
-      >
+      <div className="absolute bg-white p-4 rounded-2xl shadow-lg text-gray-900 space-y-5">
         {/* Title */}
         <div className="flex space-x-3 items-center sx__has-icon sx__event-modal__title font-semibold text-lg">
           <div

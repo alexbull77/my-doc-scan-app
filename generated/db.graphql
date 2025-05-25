@@ -345,6 +345,7 @@ type images {
   event_id: uuid!
   id: uuid!
   recognized_text: String!
+  title: String
 }
 
 """
@@ -406,6 +407,7 @@ input images_bool_exp {
   event_id: uuid_comparison_exp
   id: uuid_comparison_exp
   recognized_text: String_comparison_exp
+  title: String_comparison_exp
 }
 
 """
@@ -427,6 +429,7 @@ input images_insert_input {
   event_id: uuid
   id: uuid
   recognized_text: String
+  title: String
 }
 
 """aggregate max on columns"""
@@ -435,6 +438,7 @@ type images_max_fields {
   event_id: uuid
   id: uuid
   recognized_text: String
+  title: String
 }
 
 """
@@ -445,6 +449,7 @@ input images_max_order_by {
   event_id: order_by
   id: order_by
   recognized_text: order_by
+  title: order_by
 }
 
 """aggregate min on columns"""
@@ -453,6 +458,7 @@ type images_min_fields {
   event_id: uuid
   id: uuid
   recognized_text: String
+  title: String
 }
 
 """
@@ -463,6 +469,7 @@ input images_min_order_by {
   event_id: order_by
   id: order_by
   recognized_text: order_by
+  title: order_by
 }
 
 """
@@ -492,6 +499,7 @@ input images_order_by {
   event_id: order_by
   id: order_by
   recognized_text: order_by
+  title: order_by
 }
 
 """primary key columns input for table: images"""
@@ -514,6 +522,9 @@ enum images_select_column {
 
   """column name"""
   recognized_text
+
+  """column name"""
+  title
 }
 
 """
@@ -524,6 +535,7 @@ input images_set_input {
   event_id: uuid
   id: uuid
   recognized_text: String
+  title: String
 }
 
 """
@@ -543,6 +555,7 @@ input images_stream_cursor_value_input {
   event_id: uuid
   id: uuid
   recognized_text: String
+  title: String
 }
 
 """
@@ -560,6 +573,9 @@ enum images_update_column {
 
   """column name"""
   recognized_text
+
+  """column name"""
+  title
 }
 
 input images_updates {

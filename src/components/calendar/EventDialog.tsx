@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,17 +6,12 @@ import {
   DialogActions,
   TextField,
   IconButton,
-  Typography,
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
   Button,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import dayjs from "dayjs";
-import Tesseract from "tesseract.js";
 import {
   createEvent,
   type IInsertEvent,
@@ -30,20 +25,21 @@ import { useForm, Controller } from "react-hook-form";
 import { updateEvent } from "../../api/mutations/updateEvent.mutation";
 import { useCalendarStore } from "../../calendarStore";
 
+import { EventImages } from "./EventImages"; // import the new component
+
 export const EventDialog = () => {
   const { selectedDate, open, setOpen, selectedEvent } = useCalendarStore();
   const { start, end } = getRoundedStartEnd(selectedDate);
 
-  const { control, register, handleSubmit, setValue, watch, reset } =
-    useForm<IInsertEvent>({
-      defaultValues: {
-        title: "",
-        description: "",
-        start,
-        end,
-        images: { data: [] },
-      },
-    });
+  const { control, register, handleSubmit, reset } = useForm<IInsertEvent>({
+    defaultValues: {
+      title: "",
+      description: "",
+      start,
+      end,
+      images: { data: [] },
+    },
+  });
 
   useEffect(() => {
     if (selectedEvent) {
@@ -81,11 +77,12 @@ export const EventDialog = () => {
     },
   });
 
-  const images = watch("images.data");
-
   const isPending = createPending || updatePending;
 
   const isEdit = selectedEvent?.id;
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const onSubmit = (data: IInsertEvent) => {
     if (selectedEvent?.id) {
@@ -101,43 +98,10 @@ export const EventDialog = () => {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const files = Array.from(e.target.files);
-
-    for (const file of files) {
-      const base_64 = await fileToBase64(file);
-      const {
-        data: { text: ocrText },
-      } = await Tesseract.recognize(file, "eng+rus+ron");
-
-      const newImage = {
-        base_64,
-        recognized_text: ocrText.trim(),
-      };
-
-      setValue("images", {
-        data: [...(images || []), newImage],
-      });
-    }
-  };
-
-  const fileToBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-
-  const removeImage = (index: number) => {
-    const updatedImages = images?.filter((_, i) => i !== index) || [];
-    setValue("images", { data: updatedImages });
-  };
-
   return (
     <Dialog
       open={open}
+      fullScreen={isMobile}
       onClose={() => {
         if (!isPending) {
           setOpen(false);
@@ -147,7 +111,14 @@ export const EventDialog = () => {
       maxWidth="sm"
       scroll="body"
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: isMobile ? "100dvh" : "80dvh",
+        }}
+      >
         <DialogTitle
           sx={{
             m: 0,
@@ -224,51 +195,27 @@ export const EventDialog = () => {
             margin="normal"
           />
 
-          <Button
-            variant="outlined"
-            component="label"
-            startIcon={<AddPhotoAlternateIcon />}
-            sx={{ mb: 2 }}
-          >
-            Attach Photos
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              capture="environment"
-              hidden
-              onChange={handleFileChange}
-            />
-          </Button>
+          <Controller
+            control={control}
+            name="images"
+            defaultValue={{ data: [] }}
+            render={({ field }) => {
+              // field.value should be { data: ImageType[] }
+              const imagesArray = field.value?.data || [];
 
-          {!!images?.length && (
-            <ImageList cols={3} gap={8}>
-              {images.map((img, idx) => (
-                <ImageListItem key={idx}>
-                  <img src={img.base_64 || ""} alt={`Attachment ${idx + 1}`} />
-                  <ImageListItemBar
-                    position="top"
-                    actionIcon={
-                      <IconButton
-                        onClick={() => removeImage(idx)}
-                        sx={{ color: "white" }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    }
-                  />
-                  {img.recognized_text && (
-                    <Typography
-                      variant="caption"
-                      sx={{ mt: 1, display: "block", whiteSpace: "pre-wrap" }}
-                    >
-                      {img.recognized_text}
-                    </Typography>
-                  )}
-                </ImageListItem>
-              ))}
-            </ImageList>
-          )}
+              // wrapper to keep structure { data: [...] }
+              const setImagesWrapper = (imgs: typeof imagesArray) => {
+                field.onChange({ data: imgs });
+              };
+
+              return (
+                <EventImages
+                  images={imagesArray}
+                  setImages={setImagesWrapper}
+                />
+              );
+            }}
+          />
         </DialogContent>
 
         <DialogActions sx={{ paddingY: 2 }}>

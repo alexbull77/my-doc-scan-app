@@ -9,7 +9,7 @@ import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp
 import "@schedule-x/theme-default/dist/index.css";
 import { useEffect } from "react";
 import { EventDialog } from "./EventDialog";
-import { Button } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { eventsQueryOptions } from "../../eventQueryOptions";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
@@ -56,11 +56,7 @@ export const CalendarIndex = () => {
         calendarApp={calendar}
         customComponents={customComponents}
       />
-      <Button
-        variant="text"
-        color="primary"
-        size="large"
-        className="rounded-full"
+      <IconButton
         onClick={() => {
           setSelectedEvent(null);
           setOpen(true);
@@ -69,11 +65,13 @@ export const CalendarIndex = () => {
           position: "fixed",
           right: "1rem",
           bottom: "1rem",
-          color: "black",
+          width: "fit",
+          color: "#6750a4",
+          backgroundColor: "#eaddff",
         }}
       >
         <AddCircleOutlineSharpIcon fontSize="large" />
-      </Button>
+      </IconButton>
       <EventDialog />
     </div>
   );
