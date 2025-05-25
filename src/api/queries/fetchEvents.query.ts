@@ -1,29 +1,30 @@
 import { processServerError } from "../../helpers/processServerError";
-import { getClient, graphql } from "../client";
+import { getClient, graphql, type ResultOf } from "../client";
+
+const fetchEventsQuery = graphql(`
+  query fetchEvents {
+    event {
+      id
+      title
+      description
+      start
+      end
+      images {
+        id
+        base_64
+        recognized_text
+      }
+    }
+  }
+`);
+
+export type IFetchedEvent = ResultOf<typeof fetchEventsQuery>["event"][0];
 
 export const fetchEvents = async () => {
   try {
     const client = await getClient();
 
-    const { data, error } = await client.query(
-      graphql(`
-        query fetchEvents {
-          event {
-            id
-            title
-            description
-            start
-            end
-            images {
-              id
-              base_64
-              recognized_text
-            }
-          }
-        }
-      `),
-      {}
-    );
+    const { data, error } = await client.query(fetchEventsQuery, {});
 
     if (error) processServerError(error);
 

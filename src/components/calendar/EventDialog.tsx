@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,6 +12,7 @@ import {
   ImageListItemBar,
   Button,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import dayjs from "dayjs";
@@ -26,14 +27,12 @@ import { eventsQueryOptions } from "../../eventQueryOptions";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { getRoundedStartEnd } from "../../helpers/getRoundedStartEnd";
 import { useForm, Controller } from "react-hook-form";
+import { updateEvent } from "../../api/mutations/updateEvent.mutation";
+import { useCalendarStore } from "../../calendarStore";
 
-export const EventDialog: React.FC<{
-  date: string;
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  eventId: string | number | null;
-}> = ({ date: initialDate, open, setOpen }) => {
-  const { start, end } = getRoundedStartEnd(initialDate);
+export const EventDialog = () => {
+  const { selectedDate, open, setOpen, selectedEvent } = useCalendarStore();
+  const { start, end } = getRoundedStartEnd(selectedDate);
 
   const { control, register, handleSubmit, setValue, watch, reset } =
     useForm<IInsertEvent>({
@@ -46,7 +45,21 @@ export const EventDialog: React.FC<{
       },
     });
 
-  const { mutate: handleCreateEvent, isPending } = useMutation({
+  useEffect(() => {
+    if (selectedEvent) {
+      reset(selectedEvent);
+    } else {
+      reset({
+        title: "",
+        description: "",
+        start,
+        end,
+        images: { data: [] },
+      });
+    }
+  }, [selectedEvent, reset, open]);
+
+  const { mutate: handleCreateEvent, isPending: createPending } = useMutation({
     mutationKey: eventsQueryOptions.all,
     mutationFn: createEvent,
     onSuccess: (id) => {
@@ -57,10 +70,35 @@ export const EventDialog: React.FC<{
     },
   });
 
+  const { mutate: handleUpdateEvent, isPending: updatePending } = useMutation({
+    mutationKey: eventsQueryOptions.all,
+    mutationFn: updateEvent,
+    onSuccess: (id) => {
+      if (!id) return;
+      toast.success("Event updated");
+      reset();
+      setOpen(false);
+    },
+  });
+
   const images = watch("images.data");
 
+  const isPending = createPending || updatePending;
+
+  const isEdit = selectedEvent?.id;
+
   const onSubmit = (data: IInsertEvent) => {
-    handleCreateEvent(data);
+    if (selectedEvent?.id) {
+      const { images, ...rest } = data;
+      handleUpdateEvent({
+        id: selectedEvent.id,
+        event: rest,
+        images:
+          images?.data.map((i) => ({ ...i, event_id: selectedEvent.id })) || [],
+      });
+    } else {
+      handleCreateEvent(data);
+    }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +148,29 @@ export const EventDialog: React.FC<{
       scroll="body"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTitle>New event</DialogTitle>
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {isEdit ? "Edit event" : "New event"}
+          <IconButton
+            aria-label="close"
+            onClick={() => {
+              if (!isPending) setOpen(false);
+            }}
+            edge="end"
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
         <DialogContent dividers className="flex flex-col gap-y-2">
           <TextField
             fullWidth
@@ -221,7 +281,7 @@ export const EventDialog: React.FC<{
             color="primary"
             disabled={isPending}
           >
-            Save event
+            {isEdit ? "Save changes" : "Create"}
           </Button>
         </DialogActions>
       </form>
