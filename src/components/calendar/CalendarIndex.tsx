@@ -7,12 +7,14 @@ import {
 } from "@schedule-x/calendar";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
 import "@schedule-x/theme-default/dist/index.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
-import { NoteModal } from "./NoteModal";
+import { EventDialog } from "./EventDialog";
 import { Button } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { eventsQueryOptions } from "../../eventQueryOptions";
 
 export const CalendarIndex = () => {
   const [selectedDate, setSelectedDate] = useState<string>(
@@ -36,25 +38,18 @@ export const CalendarIndex = () => {
       start: "06:00",
       end: "00:00",
     },
-    events: [
-      {
-        id: "1",
-        title: "Event 1",
-        start: "2025-05-16",
-        end: "2025-05-16",
-      },
-      {
-        id: "2",
-        title: "Event 2",
-        start: "2025-05-16 10:00",
-        end: "2025-05-16 12:00",
-      },
-    ],
+    events: [],
     callbacks: {
       onClickDate: (date) => setSelectedDate(date),
       onEventClick: (event) => setSelectedEventId(event.id),
     },
   });
+
+  const { data: events } = useQuery(eventsQueryOptions.events());
+
+  useEffect(() => {
+    calendar?.events.set(events);
+  }, [events, calendar]);
 
   return (
     <div>
@@ -74,7 +69,7 @@ export const CalendarIndex = () => {
       >
         <AddCircleOutlineSharpIcon fontSize="large" />
       </Button>
-      <NoteModal
+      <EventDialog
         date={selectedDate}
         eventId={selectedEventId}
         open={open}
