@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { IFetchedEvent } from "../api/queries/fetchEvents.query";
-import { parse } from "date-fns";
+import { isAfter, parse } from "date-fns";
 
 export const useNotifications = (events: IFetchedEvent[]) => {
   useEffect(() => {
@@ -17,19 +17,19 @@ export const useNotifications = (events: IFetchedEvent[]) => {
 
         // Notify 10 minutes before
         const notificationLeadTime = 10 * 60 * 1000;
-        const timeout = timeUntilEvent - notificationLeadTime;
 
-        if (timeout > 0 && timeUntilEvent <= 24 * 60 * 60 * 1000) {
-          setTimeout(() => {
-            new Notification(event.title, {
-              body: `Starts at ${eventStart.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}`,
-              icon: "/pwa-icon-192.png",
-              badge: "/pwa-icon-192.png",
-            });
-          }, timeout);
+        if (
+          isAfter(eventStart, new Date()) &&
+          timeUntilEvent < notificationLeadTime
+        ) {
+          new Notification(event.title, {
+            body: `Starts at ${eventStart.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}`,
+            icon: "/pwa-icon-192.png",
+            badge: "/pwa-icon-192.png",
+          });
         }
       });
     };
