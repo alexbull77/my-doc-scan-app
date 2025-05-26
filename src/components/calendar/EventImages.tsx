@@ -4,13 +4,14 @@ import {
   Button,
   TextField,
   Box,
-  CircularProgress,
   Typography,
+  LinearProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import Tesseract from "tesseract.js";
+import { createWorker } from "tesseract.js";
 import { processServerError } from "../../helpers/processServerError";
+import { compressImage } from "../../helpers/compressImage";
 
 interface ImageType {
   base_64?: string | null;
@@ -28,6 +29,7 @@ export const EventImages: React.FC<EventImagesProps> = ({
   setImages,
 }) => {
   const [isRecognizing, setIsRecognizing] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -41,13 +43,25 @@ export const EventImages: React.FC<EventImagesProps> = ({
     try {
       if (!e.target.files) return;
       const files = Array.from(e.target.files);
+      setIsRecognizing(true);
+
+      const worker = await createWorker(["eng", "rus", "ron"], undefined, {
+        logger: (m) => {
+          if (m.status === "recognizing text") {
+            setProgress(Math.round(m.progress * 100));
+          }
+        },
+      });
 
       for (const file of files) {
-        const base_64 = await fileToBase64(file);
-        setIsRecognizing(true);
+        setProgress(0);
+
+        const compressed = await compressImage(file);
+        const base_64 = await fileToBase64(compressed);
+
         const {
           data: { text: ocrText },
-        } = await Tesseract.recognize(file, "eng+rus+ron");
+        } = await worker.recognize(compressed);
 
         const newImage = {
           base_64,
@@ -57,9 +71,10 @@ export const EventImages: React.FC<EventImagesProps> = ({
 
         setImages([...images, newImage]);
       }
+
+      await worker.terminate();
     } catch (error) {
       processServerError(error);
-      return;
     } finally {
       setIsRecognizing(false);
     }
@@ -70,7 +85,6 @@ export const EventImages: React.FC<EventImagesProps> = ({
     setImages(updatedImages);
   };
 
-  // Handler to update recognized text for a specific image by index
   const handleRecognizedTextChange = (index: number, newText: string) => {
     const updatedImages = [...images];
     updatedImages[index] = {
@@ -82,40 +96,8 @@ export const EventImages: React.FC<EventImagesProps> = ({
 
   return (
     <>
-      <Button
-        variant="outlined"
-        disabled={isRecognizing}
-        component="label"
-        startIcon={<AddPhotoAlternateIcon />}
-        sx={{ mb: 2 }}
-      >
-        Attach Photos
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          capture="environment"
-          hidden
-          onChange={handleFileChange}
-        />
-      </Button>
-
-      {isRecognizing && (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            mb: 2,
-          }}
-        >
-          <CircularProgress size={24} />
-          <Typography>Recognizing text, please wait...</Typography>
-        </Box>
-      )}
-
       {!!images.length && (
-        <div>
+        <div className="flex flex-col gap-y-4">
           {images.map((img, idx) => (
             <div className="flex flex-col gap-y-2" key={idx}>
               <div className="flex justify-between items-center">
@@ -140,6 +122,33 @@ export const EventImages: React.FC<EventImagesProps> = ({
             </div>
           ))}
         </div>
+      )}
+
+      <Button
+        variant="outlined"
+        disabled={isRecognizing}
+        component="label"
+        startIcon={<AddPhotoAlternateIcon />}
+        sx={{ mb: 2 }}
+      >
+        Attach Photos
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          capture="environment"
+          hidden
+          onChange={handleFileChange}
+        />
+      </Button>
+
+      {isRecognizing && (
+        <Box sx={{ width: "100%", mb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            Recognizing text: {progress}%
+          </Typography>
+          <LinearProgress variant="determinate" value={progress} />
+        </Box>
       )}
     </>
   );
