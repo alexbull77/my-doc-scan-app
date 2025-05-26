@@ -17,13 +17,17 @@ import { customComponents } from "./custom-components/CustomComponents";
 import { useCalendarStore } from "../../calendarStore";
 import { format } from "date-fns";
 import { createScrollControllerPlugin } from "@schedule-x/scroll-controller";
+import { useUser } from "@clerk/clerk-react";
+import { MobileDrawer } from "../MobileDrawer";
 
 export const CalendarIndex = () => {
-  const { setOpen, selectedDate, setSelectedDate, setSelectedEvent } =
+  const { setOpen, selectedDate, setSelectedDate, setSelectedEvent, locale } =
     useCalendarStore();
 
+  const { user } = useUser();
+
   const calendar = useCalendarApp({
-    locale: "ru-RU",
+    locale,
     selectedDate,
     defaultView: viewWeek.name,
     views: [viewDay, viewWeek, viewMonthGrid, viewMonthAgenda],
@@ -51,7 +55,12 @@ export const CalendarIndex = () => {
   }, [events, calendar]);
 
   return (
-    <div>
+    <div className="h-[100dvh] w-[10dvw] calendar-wrapper">
+      <div className="h-[10dvh] w-[100dvw] flex gap-x-4 justify-between items-center drop-shadow-xl bg-white border-b border-[#6750a4] px-4">
+        <MobileDrawer />
+        <div className="text-lg text-gray-800">Calendar</div>
+        <img className="w-10 h-10 rounded-full" src={user?.imageUrl} />
+      </div>
       <ScheduleXCalendar
         calendarApp={calendar}
         customComponents={customComponents}

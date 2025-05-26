@@ -11,6 +11,7 @@
         "gen": "gql.tada generate schema 'https://modern-scheduler.hasura.app/v1/graphql' -o ./generated/db.graphql --header \"x-hasura-admin-secret: Wor5bSIivffD4DJOE0AP1ZOagUFHrQJfqkBNJ9k1u7a1mlmKvyJC5fbTiDI2Kk91\" && gql-tada generate output"
     },
     "dependencies": {
+        "@clerk/clerk-react": "^5.31.6",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
         "@mui/icons-material": "^7.1.0",

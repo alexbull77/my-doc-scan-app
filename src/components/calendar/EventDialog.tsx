@@ -26,24 +26,36 @@ import { updateEvent } from "../../api/mutations/updateEvent.mutation";
 import { useCalendarStore } from "../../calendarStore";
 
 import { EventImages } from "./EventImages"; // import the new component
+import { useUser } from "@clerk/clerk-react";
 
 export const EventDialog = () => {
   const { selectedDate, open, setOpen, selectedEvent } = useCalendarStore();
   const { start, end } = getRoundedStartEnd(selectedDate);
+  const { user } = useUser();
 
-  const { control, register, handleSubmit, reset } = useForm<IInsertEvent>({
-    defaultValues: {
-      title: "",
-      description: "",
-      start,
-      end,
-      images: { data: [] },
-    },
-  });
+  const { control, register, handleSubmit, reset, setValue } =
+    useForm<IInsertEvent>({
+      defaultValues: {
+        title: "",
+        description: "",
+        start,
+        end,
+        images: { data: [] },
+        user_id: user?.id,
+      },
+    });
+
+  useEffect(() => {
+    if (!user) return;
+    setValue("user_id", user?.id);
+  }, [user, user?.id, setValue]);
 
   useEffect(() => {
     if (selectedEvent) {
-      reset(selectedEvent);
+      reset({
+        ...selectedEvent,
+        user_id: user?.id,
+      });
     } else {
       reset({
         title: "",
@@ -51,9 +63,10 @@ export const EventDialog = () => {
         start,
         end,
         images: { data: [] },
+        user_id: user?.id,
       });
     }
-  }, [selectedEvent, reset, open]);
+  }, [selectedEvent, reset, open, user?.id]);
 
   const { mutate: handleCreateEvent, isPending: createPending } = useMutation({
     mutationKey: eventsQueryOptions.all,
@@ -143,6 +156,7 @@ export const EventDialog = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent dividers className="flex flex-col gap-y-2">
+          <input type="hidden" {...register("user_id")} />
           <TextField
             fullWidth
             multiline

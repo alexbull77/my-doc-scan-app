@@ -1,4 +1,11 @@
+/* Your custom override */
+.calendar-wrapper .sx__calendar {
+  border: none;
+  border-radius: 0;
+}
+
+
 .sx-react-calendar-wrapper {
-    height: 100vh;
+    height: 90dvh;
     width: 100vw;
 }
