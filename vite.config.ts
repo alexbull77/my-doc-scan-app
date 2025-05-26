@@ -13,8 +13,8 @@ export default defineConfig({
       includeAssets: ["favicon.svg"],
       manifest: {
         name: "Doc Scanner Calendar",
-        short_name: "DocScan",
-        description: "Scan documents and attach them to calendar notes.",
+        short_name: "My Calendar",
+        description: "Scan documents and attach them to calendar events.",
         theme_color: "#1f2937",
         icons: [
           {

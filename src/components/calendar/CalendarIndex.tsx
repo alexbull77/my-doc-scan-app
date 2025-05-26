@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { createScrollControllerPlugin } from "@schedule-x/scroll-controller";
 import { useUser } from "@clerk/clerk-react";
 import { MobileDrawer } from "../MobileDrawer";
+import { useNotifications } from "../../hooks/useNotifications";
 
 export const CalendarIndex = () => {
   const { setOpen, selectedDate, setSelectedDate, setSelectedEvent, locale } =
@@ -49,6 +50,8 @@ export const CalendarIndex = () => {
   });
 
   const { data: events } = useQuery(eventsQueryOptions.events());
+
+  useNotifications(events);
 
   useEffect(() => {
     calendar?.events.set(events);
