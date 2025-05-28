@@ -9,6 +9,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      srcDir: "src",
+      strategies: "injectManifest", // important for using custom SW with workbox precaching
       registerType: "autoUpdate",
       includeAssets: ["favicon.svg"],
       manifest: {

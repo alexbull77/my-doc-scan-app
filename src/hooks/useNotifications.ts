@@ -1,47 +1,62 @@
 import { useEffect } from "react";
-import type { IFetchedEvent } from "../api/queries/fetchEvents.query";
-import { isAfter, parse } from "date-fns";
+import { useUser } from "@clerk/clerk-react";
 
-export const useNotifications = (events: IFetchedEvent[]) => {
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+const subscribeUser = async (user_id?: string | null) => {
+  if (!("serviceWorker" in navigator)) {
+    console.error("Service workers are not supported in this browser.");
+    return;
+  }
+  try {
+    const registration = await navigator.serviceWorker.ready;
+
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(
+        import.meta.env.VITE_PUBLIC_VAPID_KEY
+      ),
+    });
+
+    await fetch(`${import.meta.env.VITE_PUSH_SERVICE_URL}/subscribe`, {
+      method: "POST",
+      body: JSON.stringify({
+        user_id,
+        subscription,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const useNotifications = () => {
+  const { user } = useUser();
   useEffect(() => {
     if (!("Notification" in window)) return;
 
-    const scheduleNotifications = () => {
-      const now = new Date();
-
-      events?.forEach((event) => {
-        if (!event.start) return;
-
-        const eventStart = parse(event.start, "yyyy-MM-dd HH:mm", new Date());
-        const timeUntilEvent = eventStart.getTime() - now.getTime();
-
-        // Notify 10 minutes before
-        const notificationLeadTime = 10 * 60 * 1000;
-
-        if (
-          isAfter(eventStart, new Date()) &&
-          timeUntilEvent < notificationLeadTime
-        ) {
-          new Notification(event.title, {
-            body: `Starts at ${eventStart.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}`,
-            icon: "/pwa-icon-192.png",
-            badge: "/pwa-icon-192.png",
-          });
-        }
-      });
-    };
-
     if (Notification.permission === "granted") {
-      scheduleNotifications();
+      subscribeUser(user?.id);
     } else if (Notification.permission !== "denied") {
       Notification.requestPermission().then((permission) => {
         if (permission === "granted") {
-          scheduleNotifications();
+          subscribeUser(user?.id);
         }
       });
     }
-  }, [events]);
+  }, [user?.id]);
 };

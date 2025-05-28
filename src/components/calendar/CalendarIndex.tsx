@@ -39,10 +39,6 @@ export const CalendarIndex = () => {
       }),
     ],
     isDark: false,
-    dayBoundaries: {
-      start: "06:00",
-      end: "00:00",
-    },
     events: [],
     callbacks: {
       onClickDate: (date) => setSelectedDate(date),
@@ -51,7 +47,7 @@ export const CalendarIndex = () => {
 
   const { data: events } = useQuery(eventsQueryOptions.events());
 
-  useNotifications(events);
+  useNotifications();
 
   useEffect(() => {
     calendar?.events.set(events);
