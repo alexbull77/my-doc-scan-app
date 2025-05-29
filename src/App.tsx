@@ -15,10 +15,10 @@ function App() {
       <header>
         <SignedOut>
           <div className="flex flex-col w-screen h-screen items-center justify-center bg-gray-100">
-            <div className="text-4xl font-bold text-gray-800 mb-4">
+            <div className="text-4xl font-bold text-gray-800 mb-4 font-arsenal">
               Welcome 👋
             </div>
-            <div className="text-lg text-gray-600 mb-6">
+            <div className="text-lg text-gray-600 mb-6 font-arsenal">
               Please sign in to access your calendar
             </div>
             <SignInButton>

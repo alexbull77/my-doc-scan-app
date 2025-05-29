@@ -37,6 +37,7 @@ export const CalendarIndex = () => {
     locale,
     selectedDate,
     defaultView: viewWeek.name,
+    theme: "",
     views: [viewMonthGrid, viewMonthAgenda, viewDay, viewWeek],
     plugins: [
       createEventModalPlugin(),
@@ -66,7 +67,7 @@ export const CalendarIndex = () => {
 
   return (
     <div className="h-[100dvh] w-[10dvw] calendar-wrapper">
-      <div className="h-[10dvh] w-[100dvw] flex gap-x-4 justify-between items-center drop-shadow-xl bg-white border-b border-[#6750a4] px-4">
+      <div className="h-[10dvh] w-[100dvw] flex gap-x-4 justify-between items-center drop-shadow-xl bg-white border-b border-[#6F8537] px-4">
         <MobileDrawer />
         <div className="text-lg text-gray-800">Calendar</div>
         <img className="w-10 h-10 rounded-full" src={user?.imageUrl} />
@@ -85,8 +86,8 @@ export const CalendarIndex = () => {
           right: "1rem",
           bottom: "1rem",
           width: "fit",
-          color: "#6750a4",
-          backgroundColor: "#eaddff",
+          color: "#6F8537",
+          backgroundColor: "#E4EACE",
         }}
       >
         <AddCircleOutlineSharpIcon fontSize="large" />

@@ -4,8 +4,42 @@
   border-radius: 0;
 }
 
-
 .sx-react-calendar-wrapper {
     height: 90dvh;
     width: 100vw;
+}
+
+:root {
+  --sx-color-primary: #6F8537 !important;
+  --sx-color-on-primary: #fff !important;
+  --sx-color-primary-container: #E4EACE !important;
+  --sx-color-on-primary-container: #21005e !important;
+  --sx-color-secondary: #625b71 !important;
+  --sx-color-on-secondary: #fff !important;
+  --sx-color-secondary-container: #e8def8 !important;
+  --sx-color-on-secondary-container: #1e192b !important;
+  --sx-color-tertiary: #7d5260 !important;
+  --sx-color-on-tertiary: #fff !important;
+  --sx-color-tertiary-container: #ffd8e4 !important;
+  --sx-color-on-tertiary-container: #370b1e !important;
+  --sx-color-surface: #fef7ff !important;
+  --sx-color-surface-dim: #ded8e1 !important;
+  --sx-color-surface-bright: #fef7ff !important;
+  --sx-color-on-surface: #1c1b1f !important;
+  --sx-color-surface-container: #f3edf7 !important;
+  --sx-color-surface-container-low: #f7f2fa !important;
+  --sx-color-surface-container-high: #ece6f0 !important;
+  --sx-color-background: #fff !important;
+  --sx-color-on-background: #1c1b1f !important;
+  --sx-color-outline: #79747e !important;
+  --sx-color-outline-variant: #c4c7c5 !important;
+  --sx-color-shadow: #000 !important;
+  --sx-color-surface-tint: #6F8537 !important;
+  --sx-color-neutral: var(--sx-color-outline) !important;
+  --sx-color-neutral-variant: var(--sx-color-outline-variant) !important;
+ 
+  --sx-internal-color-gray-ripple-background: #e0e0e0 !important;
+  --sx-internal-color-light-gray: #fafafa !important;
+  --sx-internal-color-text: #000 !important;
+  
 }

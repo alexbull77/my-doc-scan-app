@@ -13,7 +13,7 @@ export const MobileDrawer = () => {
   return (
     <>
       <IconButton edge="start" color="inherit" onClick={toggleDrawer(true)}>
-        <MenuIcon className="text-[#6750a4]" />
+        <MenuIcon className="text-[#6F8537]" />
       </IconButton>
 
       <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
