@@ -1,15 +1,37 @@
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { format, parse } from "date-fns";
 import { useCalendarStore } from "../../../calendarStore";
 import type { IFetchedEvent } from "../../../api/queries/fetchEvents.query";
 
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { useMutation } from "@tanstack/react-query";
+import { eventsQueryOptions } from "../../../eventQueryOptions";
+import { toast } from "sonner";
+import { deleteEvent } from "../../../api/mutations/deleteEvent.mutation";
+import { useRef } from "react";
 
 export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
   calendarEvent,
 }) => {
   {
-    const { setSelectedEvent, setOpen } = useCalendarStore();
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    const { setSelectedEvent, setOpen, removeCalendarEvent } =
+      useCalendarStore();
+
+    const { mutate: handleDeleteEvent, isPending: deletePending } = useMutation(
+      {
+        mutationKey: eventsQueryOptions.all,
+        mutationFn: deleteEvent,
+        onSuccess: (id) => {
+          if (!id) return;
+          toast.success("Event deleted");
+          modalRef.current?.remove();
+          removeCalendarEvent(id);
+        },
+      }
+    );
 
     if (!calendarEvent.start || !calendarEvent.end) return null;
 
@@ -21,7 +43,10 @@ export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
     const endDate = parse(calendarEvent.end, "yyyy-MM-dd HH:mm", new Date());
 
     return (
-      <div className="absolute bg-white p-4 rounded-2xl shadow-lg text-gray-900 space-y-5">
+      <div
+        ref={modalRef}
+        className=" absolute bg-white p-4 rounded-2xl shadow-lg text-gray-900 space-y-5"
+      >
         {/* Title */}
         <div className="flex space-x-3 items-center sx__has-icon sx__event-modal__title font-semibold text-lg">
           <div
@@ -90,11 +115,12 @@ export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
           </svg>
           <div>{calendarEvent.description || "No description"}</div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-x-2">
           <Button
             variant="text"
             size="small"
             endIcon={<EditOutlinedIcon />}
+            disabled={deletePending}
             onClick={() => {
               setOpen(true);
               setSelectedEvent({
@@ -108,6 +134,21 @@ export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
             }}
           >
             Edit
+          </Button>
+          <Button
+            size="small"
+            disabled={deletePending}
+            endIcon={
+              deletePending ? (
+                <CircularProgress size={18} />
+              ) : (
+                <DeleteOutlineIcon />
+              )
+            }
+            color="error"
+            onClick={() => handleDeleteEvent(calendarEvent.id)}
+          >
+            Delete
           </Button>
         </div>
       </div>

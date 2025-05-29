@@ -22,8 +22,14 @@ import { MobileDrawer } from "../MobileDrawer";
 import { useNotifications } from "../../hooks/useNotifications";
 
 export const CalendarIndex = () => {
-  const { setOpen, selectedDate, setSelectedDate, setSelectedEvent, locale } =
-    useCalendarStore();
+  const {
+    setOpen,
+    selectedDate,
+    setSelectedDate,
+    setSelectedEvent,
+    locale,
+    setRemoveCalendarEvent,
+  } = useCalendarStore();
 
   const { user } = useUser();
 
@@ -31,7 +37,7 @@ export const CalendarIndex = () => {
     locale,
     selectedDate,
     defaultView: viewWeek.name,
-    views: [viewDay, viewWeek, viewMonthGrid, viewMonthAgenda],
+    views: [viewMonthGrid, viewMonthAgenda, viewDay, viewWeek],
     plugins: [
       createEventModalPlugin(),
       createScrollControllerPlugin({
@@ -44,6 +50,11 @@ export const CalendarIndex = () => {
       onClickDate: (date) => setSelectedDate(date),
     },
   });
+
+  useEffect(() => {
+    if (!calendar) return;
+    setRemoveCalendarEvent(calendar.events.remove);
+  }, [calendar, setRemoveCalendarEvent]);
 
   const { data: events } = useQuery(eventsQueryOptions.events());
 

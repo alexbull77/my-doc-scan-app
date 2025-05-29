@@ -18,6 +18,8 @@ interface CalendarState {
   setSelectedDate: (date: string) => void;
   setSelectedEvent: (event: IInsertEvent | null) => void;
   setLocale: (locale: CalendarLocale) => void;
+  removeCalendarEvent: (id: string) => void;
+  setRemoveCalendarEvent: (callback: (id: string) => void) => void;
 }
 
 export const useCalendarStore = create<CalendarState>()(
@@ -31,6 +33,10 @@ export const useCalendarStore = create<CalendarState>()(
       setSelectedDate: (selectedDate) => set({ selectedDate }),
       setSelectedEvent: (selectedEvent) => set({ selectedEvent }),
       setLocale: (locale) => set({ locale }),
+      removeCalendarEvent: () => {},
+      setRemoveCalendarEvent: (callback) => {
+        set({ removeCalendarEvent: callback });
+      },
     }),
     {
       name: "calendar-store",
