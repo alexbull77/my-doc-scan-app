@@ -20,6 +20,7 @@ import { createScrollControllerPlugin } from "@schedule-x/scroll-controller";
 import { useUser } from "@clerk/clerk-react";
 import { MobileDrawer } from "../MobileDrawer";
 import { useNotifications } from "../../hooks/useNotifications";
+import { useTranslation } from "react-i18next";
 
 export const CalendarIndex = () => {
   const {
@@ -59,6 +60,7 @@ export const CalendarIndex = () => {
 
   const { data: events } = useQuery(eventsQueryOptions.events());
 
+  const { t } = useTranslation();
   useNotifications();
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export const CalendarIndex = () => {
     <div className="h-[100dvh] w-[10dvw] calendar-wrapper">
       <div className="h-[10dvh] w-[100dvw] flex gap-x-4 justify-between items-center drop-shadow-xl bg-white border-b border-[#6F8537] px-4">
         <MobileDrawer />
-        <div className="text-lg text-gray-800">Calendar</div>
+        <div className="text-lg text-gray-800">{t("calendar")}</div>
         <img className="w-10 h-10 rounded-full" src={user?.imageUrl} />
       </div>
       <ScheduleXCalendar

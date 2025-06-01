@@ -10,12 +10,15 @@ import { eventsQueryOptions } from "../../../eventQueryOptions";
 import { toast } from "sonner";
 import { deleteEvent } from "../../../api/mutations/deleteEvent.mutation";
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
   calendarEvent,
 }) => {
   {
     const modalRef = useRef<HTMLDivElement>(null);
+
+    const { t } = useTranslation();
 
     const { setSelectedEvent, setOpen, removeCalendarEvent } =
       useCalendarStore();
@@ -113,7 +116,7 @@ export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
               strokeLinecap="round"
             />
           </svg>
-          <div>{calendarEvent.description || "No description"}</div>
+          <div>{calendarEvent.description || "-"}</div>
         </div>
         <div className="flex justify-end gap-x-2">
           <Button
@@ -133,7 +136,7 @@ export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
               });
             }}
           >
-            Edit
+            {t("edit")}
           </Button>
           <Button
             size="small"
@@ -148,7 +151,7 @@ export const EventModal: React.FC<{ calendarEvent: IFetchedEvent }> = ({
             color="error"
             onClick={() => handleDeleteEvent(calendarEvent.id)}
           >
-            Delete
+            {t("delete")}
           </Button>
         </div>
       </div>

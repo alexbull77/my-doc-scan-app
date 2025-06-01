@@ -7,19 +7,22 @@ import { Button, ThemeProvider } from "@mui/material";
 import theme from "./theme";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
 import { useCalendarStore } from "./calendarStore";
+import { useTranslation } from "react-i18next";
 
 function App() {
   const { locale } = useCalendarStore();
+  const { t } = useTranslation();
+
   return (
     <ThemeProvider theme={theme}>
       <header>
         <SignedOut>
           <div className="flex flex-col w-screen h-screen items-center justify-center bg-gray-100">
             <div className="text-4xl font-bold text-gray-800 mb-4 font-arsenal">
-              Welcome 👋
+              {t("welcome")} 👋
             </div>
             <div className="text-lg text-gray-600 mb-6 font-arsenal">
-              Please sign in to access your calendar
+              {t("please_sign_in")}
             </div>
             <SignInButton>
               <Button
@@ -27,7 +30,7 @@ function App() {
                 variant="contained"
                 className="px-6 py-3 rounded-lg shadow-md transition duration-200"
               >
-                Sign In
+                {t("sign_in")}
               </Button>
             </SignInButton>
           </div>

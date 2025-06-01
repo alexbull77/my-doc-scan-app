@@ -12,6 +12,7 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { createWorker } from "tesseract.js";
 import { processServerError } from "../../helpers/processServerError";
 import { compressImage } from "../../helpers/compressImage";
+import { useTranslation } from "react-i18next";
 
 interface ImageType {
   base_64?: string | null;
@@ -94,6 +95,8 @@ export const EventImages: React.FC<EventImagesProps> = ({
     setImages(updatedImages);
   };
 
+  const { t } = useTranslation();
+
   return (
     <>
       {!!images.length && (
@@ -117,7 +120,7 @@ export const EventImages: React.FC<EventImagesProps> = ({
                   handleRecognizedTextChange(idx, e.target.value)
                 }
                 sx={{ mt: 1 }}
-                placeholder="Edit recognized text..."
+                placeholder={t("edit_recognized_text")}
               />
             </div>
           ))}
@@ -131,7 +134,7 @@ export const EventImages: React.FC<EventImagesProps> = ({
         startIcon={<AddPhotoAlternateIcon />}
         sx={{ mb: 2 }}
       >
-        Attach Photos
+        {t("attach_photos")}
         <input
           type="file"
           accept="image/*"
@@ -145,7 +148,7 @@ export const EventImages: React.FC<EventImagesProps> = ({
       {isRecognizing && (
         <Box sx={{ width: "100%", mb: 2 }}>
           <Typography variant="body2" sx={{ mb: 1 }}>
-            Recognizing text: {progress}%
+            {t("recognizing_text")}: {progress}%
           </Typography>
           <LinearProgress variant="determinate" value={progress} />
         </Box>

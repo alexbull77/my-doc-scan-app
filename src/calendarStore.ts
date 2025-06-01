@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { format } from "date-fns";
 import type { IInsertEvent } from "./api/mutations/createEvent.mutation";
 import { persist } from "zustand/middleware";
+import i18n from "./i18n"; // Assuming you have this
 
 export enum CalendarLocale {
   EN = "en-US",
@@ -32,7 +33,10 @@ export const useCalendarStore = create<CalendarState>()(
       setOpen: (open) => set({ open }),
       setSelectedDate: (selectedDate) => set({ selectedDate }),
       setSelectedEvent: (selectedEvent) => set({ selectedEvent }),
-      setLocale: (locale) => set({ locale }),
+      setLocale: (locale) => {
+        i18n.changeLanguage(locale.split("-")[0]);
+        set({ locale });
+      },
       removeCalendarEvent: () => {},
       setRemoveCalendarEvent: (callback) => {
         set({ removeCalendarEvent: callback });

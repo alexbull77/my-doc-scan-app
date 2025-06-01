@@ -27,11 +27,13 @@ import { useCalendarStore } from "../../calendarStore";
 
 import { EventImages } from "./EventImages"; // import the new component
 import { useUser } from "@clerk/clerk-react";
+import { useTranslation } from "react-i18next";
 
 export const EventDialog = () => {
   const { selectedDate, open, setOpen, selectedEvent } = useCalendarStore();
   const { start, end } = getRoundedStartEnd(selectedDate);
   const { user } = useUser();
+  const { t } = useTranslation();
 
   const { control, register, handleSubmit, reset, setValue } =
     useForm<IInsertEvent>({
@@ -141,7 +143,7 @@ export const EventDialog = () => {
             alignItems: "center",
           }}
         >
-          {isEdit ? "Edit event" : "New event"}
+          {isEdit ? t("edit_event") : t("new_event")}
           <IconButton
             aria-label="close"
             onClick={() => {
@@ -161,7 +163,7 @@ export const EventDialog = () => {
             fullWidth
             multiline
             minRows={2}
-            label="Title"
+            label={t("title")}
             {...register("title")}
             variant="outlined"
             margin="normal"
@@ -172,7 +174,7 @@ export const EventDialog = () => {
             name="start"
             render={({ field }) => (
               <DateTimePicker
-                label="Start Date & Time"
+                label={t("start_date_and_time")}
                 value={dayjs(field.value)}
                 onChange={(date) =>
                   field.onChange(date?.format("YYYY-MM-DD HH:mm"))
@@ -188,7 +190,7 @@ export const EventDialog = () => {
             name="end"
             render={({ field }) => (
               <DateTimePicker
-                label="End Date & Time"
+                label={t("end_date_and_time")}
                 value={dayjs(field.value)}
                 onChange={(date) =>
                   field.onChange(date?.format("YYYY-MM-DD HH:mm"))
@@ -203,7 +205,7 @@ export const EventDialog = () => {
             fullWidth
             multiline
             minRows={4}
-            label="Description"
+            label={t("description")}
             {...register("description")}
             variant="outlined"
             margin="normal"
@@ -234,7 +236,7 @@ export const EventDialog = () => {
 
         <DialogActions sx={{ paddingY: 2 }}>
           <Button onClick={() => setOpen(false)} disabled={isPending}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             type="submit"
@@ -242,7 +244,7 @@ export const EventDialog = () => {
             color="primary"
             disabled={isPending}
           >
-            {isEdit ? "Save changes" : "Create"}
+            {isEdit ? t("save_changes") : t("create")}
           </Button>
         </DialogActions>
       </form>
